@@ -115,26 +115,27 @@ alterarDadosPaciente: async (req, res) => {
         let json = { error: '', message: '' };
       
         try {
-          const { paci_CPF, paci_senha } = req.body;
+          const { paci_email, paci_senha } = req.body;
       
-          console.log('CPF fornecido:', paci_CPF);
+          console.log('Email fornecido:', paci_email);
           console.log('Senha fornecida:', paci_senha);
       
           // Verifica o login do paciente no modelo
-          const paciente = await PacienteModel.verificarLogin(paci_CPF, paci_senha);
+          const paciente = await PacienteModel.verificarLoginByEmail(paci_email, paci_senha);
       
           if (paciente) {
             json.message = `Login bem-sucedido!`;
           } else {
-            json.error = 'CPF ou senha inválidos.';
+            json.error = 'Email ou senha inválidos.';
           }
       
           res.json(json);
         } catch (error) {
+          console.error('Erro ao processar a solicitação de login:', error);
           json.error = 'Erro ao processar a solicitação de login.';
           res.status(500).json(json);
         }
-      },
+    },
       
       
   

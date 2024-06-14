@@ -1,81 +1,102 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Snackbar } from 'react-native-paper';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../firebase.config';
+import React from 'react';
+import { View, StyleSheet, Image } from 'react-native';
+import { TextInput, Button, RadioButton, Text, Snackbar } from 'react-native-paper';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../Cadastro/types/User.type';
 
-const LoginScreen = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [snackbarVisible, setSnackbarVisible] = useState(false);
+type SignInScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
-    const handleLogin = () => {
-        // Aqui você pode adicionar a lógica para autenticar o usuário  if (email && password) { 
-        // Simulando o login com sucesso 
-        if (email && password) {
-            signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                // Autenticação bem-sucedida, você pode lidar com o usuário autenticado aqui
-                const user = userCredential.user;
-                console.log('Usuário autenticado com sucesso:', user);
-                setSnackbarVisible(true);
-            })
-            .catch((error) => {
-                // Se ocorrer um erro durante a autenticação, manipule-o aqui
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.error('Erro ao autenticar usuário:', errorMessage);
-                setSnackbarVisible(false);
-            });
-        } else {
-            // Exibe uma mensagem de erro caso o email ou a senha estejam em branco
-            console.error('Por favor, insira um email e senha válidos.');
-            setSnackbarVisible(false);
-        }
-    };
-
+const SignInScreen = ({ navigation }: SignInScreenProps) => {
     return (
         <View style={styles.container}>
+            <Image
+                source={require('../assets/ubsLogo.png')}
+                style={styles.logo}
+            />
+            <View style={styles.radioGroup}>
+                <RadioButton.Group>
+                    <View style={styles.radioButtonContainer}>
+                        <RadioButton.Android value="Recepcionista" />
+                        <Text style={styles.radioButtonText}>Recepcionista</Text>
+                    </View>
+                    <View style={styles.radioButtonContainer}>
+                        <RadioButton.Android value="Paciente" />
+                        <Text style={styles.radioButtonText}>Paciente</Text>
+                    </View>
+                </RadioButton.Group>
+            </View>
             <TextInput
-                label="Email"
-                value={email}
-                onChangeText={setEmail}
+                label="E-mail"
                 mode="outlined"
                 style={styles.input}
+                keyboardType="email-address"
             />
             <TextInput
                 label="Senha"
-                value={password}
-                onChangeText={setPassword}
                 mode="outlined"
-                secureTextEntry
+                secureTextEntry={true}
                 style={styles.input}
+                right={<TextInput.Icon icon="eye" />}
             />
-            <Button mode="contained" onPress={handleLogin} style=
-                {styles.button}>
-                Login
+            <Button style={styles.textButton}>
+                Esqueceu sua senha?
+            </Button>
+            <Button style={styles.textButton} onPress={() => navigation.navigate('Cadastro')}>
+                Não tem uma conta? Cadastrar-se
+            </Button>
+            <Button mode="contained" style={styles.button} onPress={() => navigation.navigate('Noticias')}>
+                Entrar
             </Button>
             <Snackbar
-                visible={snackbarVisible}
-                onDismiss={() => setSnackbarVisible(false)}
+                visible={false}
                 duration={3000}
             >
-                Login realizado com sucesso!
+                Mensagem de exemplo
             </Snackbar>
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
         padding: 20,
+    },
+    logo: {
+        width: 250,
+        height: 100,
+        marginBottom: 20,
     },
     input: {
         marginBottom: 10,
+        width: '100%',
     },
     button: {
+        width: '100%',
         marginTop: 10,
     },
+    textButton: {
+        marginBottom: 5,
+    },
+    text: {
+        marginBottom: 5,
+    },
+    radioGroup: {
+        marginBottom: 20,
+        width: '100%',
+    },
+    radioButtonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    radioButtonText: {
+        marginLeft: 10,
+        fontSize: 18,
+    },
 });
-export default LoginScreen; 
+
+export default SignInScreen;
