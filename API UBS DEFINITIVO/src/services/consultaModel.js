@@ -1,69 +1,71 @@
 const db = require('../db')
 
 module.exports ={
-      // Modelo
-      umaconsul: (paci_id) => {
-        return new Promise((aceito, recusado) => {
-          const query = `
+  umaconsul: (paci_id, data) => {
+    return new Promise((aceito, recusado) => {
+        let query = `
             SELECT 
-              paciente.paci_nome, 
-              paciente.paci_cpf, 
-              ubs.ubs_nome, 
-              areas_medicas.area_nome, 
-              datas_horarios.horarios_dia, 
-              datas_horarios.horarios_horarios,
-              consulta.consul_estado
+                paciente.paci_nome, 
+                paciente.paci_cpf, 
+                ubs.ubs_nome, 
+                areas_medicas.area_nome, 
+                DATE_FORMAT(datas_horarios.horarios_dia, '%d/%m/%Y') AS horarios_dia, 
+                datas_horarios.horarios_horarios,
+                consulta.consul_estado
             FROM 
-              consulta
+                consulta
             INNER JOIN paciente ON consulta.paci_id = paciente.paci_id
             INNER JOIN ubs ON consulta.ubs_id = ubs.ubs_id
             INNER JOIN areas_medicas ON consulta.area_id = areas_medicas.area_id
             INNER JOIN datas_horarios ON consulta.horarios_id = datas_horarios.horarios_id
             WHERE
-              consulta.paci_id = ?;
-          `;
-      
-          db.query(query, [paci_id], (error, results) => {
+                consulta.paci_id = ?
+        `;
+
+        if (data) {
+            query += ` AND DATE(datas_horarios.horarios_dia) = ?`;
+        }
+
+        db.query(query, data ? [paci_id, data] : [paci_id], (error, results) => {
             if (error) {
-              recusado({ error: 'Ocorreu um erro ao buscar a consulta.', details: error });
-              return;
+                recusado({ error: 'Ocorreu um erro ao buscar a consulta.', details: error });
+                return;
             }
-      
-            // Mapeamento dos estados das consultas para texto e criação de um novo array
+
             const consultas = results.map(consulta => {
-              let estado_texto;
-              switch (consulta.consul_estado) {
-                case 1:
-                  estado_texto = 'Em espera';
-                  break;
-                case 2:
-                  estado_texto = 'Em andamento';
-                  break;
-                case 3:
-                  estado_texto = 'Finalizada';
-                  break;
-                case 4:
-                  estado_texto = 'Cancelada';
-                  break;
-                default:
-                  estado_texto = 'Estado desconhecido';
-              }
-              // Retorna um novo objeto com as informações relevantes e o texto do estado
-              return {
-                paci_nome: consulta.paci_nome,
-                paci_cpf: consulta.paci_cpf,
-                ubs_nome: consulta.ubs_nome,
-                area_nome: consulta.area_nome,
-                horarios_dia: consulta.horarios_dia,
-                horarios_horarios: consulta.horarios_horarios,
-                consul_estatos: estado_texto
-              };
+                let estado_texto;
+                switch (consulta.consul_estado) {
+                    case 1:
+                        estado_texto = 'Em espera';
+                        break;
+                    case 2:
+                        estado_texto = 'Em andamento';
+                        break;
+                    case 3:
+                        estado_texto = 'Finalizada';
+                        break;
+                    case 4:
+                        estado_texto = 'Cancelada';
+                        break;
+                    default:
+                        estado_texto = 'Estado desconhecido';
+                }
+                return {
+                    paci_nome: consulta.paci_nome,
+                    paci_cpf: consulta.paci_cpf,
+                    ubs_nome: consulta.ubs_nome,
+                    area_nome: consulta.area_nome,
+                    horarios_dia: consulta.horarios_dia, // Data já formatada
+                    horarios_horarios: consulta.horarios_horarios,
+                    consul_estatos: estado_texto
+                };
             });
-      
+
             aceito(consultas);
-          });
         });
-      },
+    });
+},
+
       
       
 

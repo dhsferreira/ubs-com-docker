@@ -3,6 +3,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import LoginScreen from '../Login/Login'; // Verifique o caminho correto
 import CadastroScreen from '../Cadastro/Cadastro'; // Verifique o caminho correto
 import NoticiasScreen from '../Noticias/telaNoticias'; // Verifique o caminho correto
+import ConsultasScreen from '../Consultas/Consultas'; // Verifique o caminho correto
 import CustomDrawerContent from './CustomDrawerContent'; // Importa o novo componente
 import { Ionicons } from '@expo/vector-icons'; // Importando ícones do Expo
 
@@ -44,6 +45,16 @@ export default function DrawerRoutes() {
           drawerLabel: 'Noticias',
           drawerIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="consultas"
+        component={ConsultasScreen}
+        options={{
+          drawerLabel: 'Minhas Consultas',
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="albums" size={size} color={color} />
           ),
         }}
       />

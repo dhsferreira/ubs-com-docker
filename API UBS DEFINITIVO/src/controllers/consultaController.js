@@ -1,25 +1,26 @@
 const consultaModel = require('../services/consultaModel');
 
 module.exports = {
-   umaconsul: async (req, res) => {
+    umaconsul: async (req, res) => {
         let json = { error: '', result: {} };
 
         try {
-            let paci_id = req.params.paci_id; // Obtém o paci_id a partir dos parâmetros da requisição
+            let paci_id = req.params.paci_id;
+            let data = req.query.data; // Obtém a data a partir dos parâmetros da query string
 
-            // Chama a função do model para buscar a consulta com o paci_id especificado
-            let consulta = await consultaModel.umaconsul(paci_id);
+            // Chama a função do model para buscar as consultas com o paci_id e data especificados
+            let consulta = await consultaModel.umaconsul(paci_id, data);
 
-               // Formata a resposta para incluir os dados das consutas
-      json.result = consulta;
+            // Formata a resposta para incluir os dados das consultas
+            json.result = consulta;
 
-      res.json(json);
-  } catch (error) {
-      // Se ocorrer um erro, envie uma resposta de erro
-      json.error = 'Erro ao buscar as consultas.';
-      res.status(500).json(json);
-  }
-},
+            res.json(json);
+        } catch (error) {
+            // Se ocorrer um erro, envie uma resposta de erro
+            json.error = 'Erro ao buscar as consultas.';
+            res.status(500).json(json);
+        }
+    },
 
 
 
